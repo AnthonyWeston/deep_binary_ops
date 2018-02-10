@@ -11,3 +11,10 @@ class TestDataGenerator(unittest.TestCase):
         expected_array = np.array([0,0,0,0,0,1,0,1], dtype = np.uint8)
         np.testing.assert_array_equal(expected_array, convert_to_binary_array(subject))
         
+
+    def test_the_data_generator_adds_two_numpy_bytes(self):
+        subject1 = np.uint8(100)
+        subject2 = np.uint8(201)
+        
+        expected_number = np.uint8(100 + 201)
+        self.assertEquals(expected_number, add_op(subject1, subject2))
