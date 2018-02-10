@@ -2,8 +2,11 @@ import numpy as np
 
 
 
-def convert_to_binary_array(number: np.uint8):
+def binary_array(number: np.uint8):
     return np.unpackbits(np.array(number, dtype = np.uint8))
+
+def comma_separated_string(array: np.ndarray):
+    return ','.join(map(str, array))
 
 def add_op(number1: np.uint8, number2: np.uint8):
     return np.add(number1, number2)
