@@ -4,14 +4,14 @@ import numpy as np
 
 
 UINT8_MAX = 255
-dirname, filename = os.path.split(os.path.abspath(__file__))
-OUTPUT_FOLDER = f'{dirname}/training_data'
+dirname, _ = os.path.split(os.path.abspath(__file__))
+OUTPUT_FOLDER = '{0}/training_data'.format(dirname)
 
 
 def generate_training_data():
     
     for op in [dg.add_op, dg.multiply_op, dg.xor_op]:
-        with open(f'{OUTPUT_FOLDER}/{op.__name__}.csv', 'w') as output_file:
+        with open('{0}/{1}.csv'.format(OUTPUT_FOLDER, op.__name__), 'w') as output_file:
             output_file.write(csv_header())
             
             for x in range(UINT8_MAX + 1):
@@ -34,7 +34,7 @@ def csv_header():
     header = ''
     for var_name in ['x', 'y', 'z']:
         for subscript in range(7, -1, -1):
-            header += f'{var_name}{subscript}'
+            header += var_name + str(subscript)
             header += ',' if subscript > 0 else ''
         
         header += ',' if var_name != 'z' else '\n'
