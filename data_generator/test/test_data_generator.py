@@ -34,8 +34,3 @@ class TestDataGenerator(unittest.TestCase):
         expected_number = np.uint8(100 ^ 201)
         self.assertEquals(expected_number, xor_op(subject1, subject2))
         
-    def test_the_data_generator_converts_a_numpy_array_to_a_comma_separated_string(self):
-        subject = np.arange(5, dtype = np.uint8)
-        
-        expected_string = '0,1,2,3,4'
-        self.assertEquals(expected_string, comma_separated_string(subject))
