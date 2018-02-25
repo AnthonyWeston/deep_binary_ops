@@ -17,9 +17,11 @@ def generate_training_data():
 
 def generate_training_example(x, y):
     x_values = dg.binary_array(x)
+    y_values = dg.binary_array(y)
     
     training_example = tf.train.Example(features = tf.train.Features(feature = {
-        'x': tf.train.Feature(int64_list = tf.train.Int64List(value = x_values))
+        'x': tf.train.Feature(int64_list = tf.train.Int64List(value = x_values)),
+        'y': tf.train.Feature(int64_list = tf.train.Int64List(value = y_values))
         }))
     
     return training_example
