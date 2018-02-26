@@ -157,6 +157,3 @@ local.properties
 .cache-main
 .scala_dependencies
 .worksheet
-
-# Training data files
-.csv

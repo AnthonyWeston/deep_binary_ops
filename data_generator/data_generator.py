@@ -13,3 +13,5 @@ def multiply_op(number1: np.uint8, number2: np.uint8):
 
 def xor_op(number1: np.uint8, number2: np.uint8):
     return np.bitwise_xor(number1, number2)
+
+OPERATIONS = (add_op, multiply_op, xor_op)

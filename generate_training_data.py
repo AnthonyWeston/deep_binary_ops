@@ -1,20 +1,23 @@
 import data_generator.data_generator as dg
 import os
 import tensorflow as tf
-from data_generator import *
-
 
 UINT8_MAX = 255
 dirname, _ = os.path.split(os.path.abspath(__file__))
 OUTPUT_FOLDER = '{0}/training_data'.format(dirname)
 
 
-def generate_training_data():
-    
-    for op in [dg.add_op, dg.multiply_op, dg.xor_op]:         
-        for x in range(UINT8_MAX + 1):
-            for y in range(UINT8_MAX + 1):
-                generate_training_example(x, y, op)
+def generate_training_data(limit: int = UINT8_MAX, operations = dg.OPERATIONS, 
+    output_directory: str = 'training_data/'):
+
+    for op in operations:
+        output_filename = '{0}{1}_data.tfrecords'.format(output_directory, op.__name__)  
+        with tf.python_io.TFRecordWriter(output_filename) as writer:       
+            for x in range(limit + 1):
+                for y in range(limit + 1):
+                    training_example = generate_training_example(x, y, op)
+                    training_example_str = training_example.SerializeToString()
+                    writer.write(training_example_str)
 
 def generate_training_example(x, y, op):
     x_values = dg.binary_array(x)
