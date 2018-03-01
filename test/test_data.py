@@ -31,3 +31,12 @@ class TestData(unittest.TestCase):
         
         expected_array = np.ndarray([0,0,0,0,0,0,0,0])
         np.testing.assert_array_equal(expected_array, first_row_values['y'])
+        
+    def test_the_data_model_parses_the_z_values_from_a_tfrecords_file(self):
+        subject = self.dataset.map(Data._parse)
+        
+        iterator = subject.make_one_shot_iterator()
+        first_row_values = iterator.get_next()
+        
+        expected_array = np.ndarray([0,0,0,0,0,0,0,0])
+        np.testing.assert_array_equal(expected_array, first_row_values['z'])
