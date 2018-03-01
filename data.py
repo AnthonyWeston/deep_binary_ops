@@ -4,10 +4,11 @@ class Data:
     
     @staticmethod
     def _parse(dataset: tf.data.TFRecordDataset):
-        features = {'x': tf.FixedLenFeature(shape = (8,), dtype = tf.int64)}
+        features = {'x': tf.FixedLenFeature(shape = (8,), dtype = tf.int64),
+                    'y': tf.FixedLenFeature(shape = (8,), dtype = tf.int64)}
         
         parsed_features = tf.parse_single_example(dataset, features)
-        return parsed_features["x"]
+        return parsed_features
     
     
     
