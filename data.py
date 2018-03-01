@@ -2,8 +2,11 @@ import tensorflow as tf
 
 class Data:
     
-    def __init__(self, filename_list: list):
+    def __init__(self, filename_list: list, batch_size: int):
         self.filenames = filename_list
+        self.batch_size = batch_size
+        self.full_dataset = tf.data.TFRecordDataset(self.filenames).map(self._parse).batch(self.batch_size)
+        
     
     @staticmethod
     def _parse(dataset: tf.data.TFRecordDataset):
