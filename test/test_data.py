@@ -40,3 +40,17 @@ class TestData(unittest.TestCase):
         
         expected_array = np.ndarray([0,0,0,0,0,0,0,0])
         np.testing.assert_array_equal(expected_array, first_row_values['z'])
+        
+   
+    def test_the_data_model_is_created_with_a_list_of_filenames(self):
+        expected_filename_list = ['test/test_data.tfrecords']
+        subject = Data(expected_filename_list)
+        
+        self.assertEquals(expected_filename_list, subject.filenames)
+        
+        
+        
+        
+        
+        
+        

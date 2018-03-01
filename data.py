@@ -2,6 +2,9 @@ import tensorflow as tf
 
 class Data:
     
+    def __init__(self, filename_list: list):
+        self.filenames = filename_list
+    
     @staticmethod
     def _parse(dataset: tf.data.TFRecordDataset):
         features = {'x': tf.FixedLenFeature(shape = (8,), dtype = tf.int64),
