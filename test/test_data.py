@@ -77,12 +77,17 @@ class TestData(unittest.TestCase):
         expected_class = type(tf.data.TFRecordDataset(TestData.test_filename_list).take(-1))
         self.assertEquals(expected_class, type(subject))
         
-    def test_the_data_model_counts_the_number_of_records_in_a_tfrecords_file(self):
+    def test_the_data_model_can_count_the_number_of_records_in_a_tfrecords_file(self):
         subject = TestData.test_filename_list
         
         expected_records = 16
         self.assertEquals(expected_records, Data._dataset_size(subject))
         
+    def test_the_data_model_does_count_the_number_of_records_in_a_tfrecords_file(self):
+        subject = self.dataset
+        
+        expected_records = 16
+        self.assertEquals(expected_records, self.dataset.full_dataset_size)
         
         
         
