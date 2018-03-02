@@ -8,6 +8,7 @@ class TestData(unittest.TestCase):
     sess = None
     test_filename_list = ['test/test_data.tfrecords']
     batch_size = 2
+    training_size = 10
     
     @classmethod
     def setUpClass(cls):
@@ -15,7 +16,8 @@ class TestData(unittest.TestCase):
     
     def setUp(self):
         self.tfrecord_dataset = tf.data.TFRecordDataset(['test/test_data.tfrecords'])
-        self.dataset= Data(TestData.test_filename_list, TestData.batch_size)
+        self.dataset= Data(TestData.test_filename_list, training_size = TestData.training_size, 
+            batch_size = TestData.batch_size, seed = 0)
         
     def test_the_data_model_parses_the_x_values_from_a_tfrecords_file(self):
         subject = self.tfrecord_dataset.map(Data._parse)
@@ -57,6 +59,23 @@ class TestData(unittest.TestCase):
         expected_batch_size = TestData.batch_size
         self.assertEquals(expected_batch_size, subject.batch_size)
         
+    def test_the_data_model_is_created_with_a_training_set_size(self):
+        subject = self.dataset
+        
+        expected_batch_size = TestData.training_size
+        self.assertEquals(expected_batch_size, subject.training_size)
+        
+    def test_the_data_model_is_split_into_a_training_dataset(self):
+        subject = self.dataset.training_dataset
+        
+        expected_class = type(tf.data.TFRecordDataset(TestData.test_filename_list).take(-1))
+        self.assertEquals(expected_class, type(subject))
+        
+    def test_the_data_model_is_split_into_a_test_dataset(self):
+        subject = self.dataset.test_dataset
+        
+        expected_class = type(tf.data.TFRecordDataset(TestData.test_filename_list).take(-1))
+        self.assertEquals(expected_class, type(subject))
         
         
         
