@@ -18,19 +18,19 @@ class TestDataGenerator(unittest.TestCase):
         subject2 = np.uint8(201)
         
         expected_number = np.uint8(100 + 201)
-        self.assertEquals(expected_number, add_op(subject1, subject2))
+        self.assertEqual(expected_number, add_op(subject1, subject2))
         
     def test_the_data_generator_multiplies_two_numpy_bytes(self):
         subject1 = np.uint8(100)
         subject2 = np.uint8(201)
         
         expected_number = np.uint8(100 * 201)
-        self.assertEquals(expected_number, multiply_op(subject1, subject2))
+        self.assertEqual(expected_number, multiply_op(subject1, subject2))
         
     def test_the_data_generator_computes_bitwise_xor_of_two_numpy_bytes(self):
         subject1 = np.uint8(100)
         subject2 = np.uint8(201)
         
         expected_number = np.uint8(100 ^ 201)
-        self.assertEquals(expected_number, xor_op(subject1, subject2))
+        self.assertEqual(expected_number, xor_op(subject1, subject2))
         

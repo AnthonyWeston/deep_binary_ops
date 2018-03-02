@@ -53,49 +53,49 @@ class TestData(tf.test.TestCase):
         subject = self.dataset
         
         expected_filename_list = TestData.test_filename_list
-        self.assertEquals(expected_filename_list, subject.filenames)
+        self.assertEqual(expected_filename_list, subject.filenames)
             
     def test_the_data_model_is_created_with_a_batch_size(self):
         subject = self.dataset
         
         expected_batch_size = TestData.batch_size
-        self.assertEquals(expected_batch_size, subject.batch_size)
+        self.assertEqual(expected_batch_size, subject.batch_size)
         
     def test_the_data_model_is_created_with_a_training_set_size(self):
         subject = self.dataset
         
         expected_batch_size = TestData.training_size
-        self.assertEquals(expected_batch_size, subject.training_size)
+        self.assertEqual(expected_batch_size, subject.training_size)
         
     def test_the_data_model_is_split_into_a_training_dataset(self):
         subject = self.dataset.training_dataset
         
         expected_class = type(tf.data.TFRecordDataset(TestData.test_filename_list).take(-1).batch(2))
-        self.assertEquals(expected_class, type(subject))
+        self.assertEqual(expected_class, type(subject))
         
     def test_the_data_model_is_split_into_a_test_dataset(self):
         subject = self.dataset.test_dataset
         
         expected_class = type(tf.data.TFRecordDataset(TestData.test_filename_list).take(-1).batch(2))
-        self.assertEquals(expected_class, type(subject))
+        self.assertEqual(expected_class, type(subject))
         
     def test_the_data_model_can_count_the_number_of_records_in_a_tfrecords_file(self):
         subject = TestData.test_filename_list
         
         expected_records = 16
-        self.assertEquals(expected_records, Data._dataset_size(subject))
+        self.assertEqual(expected_records, Data._dataset_size(subject))
         
     def test_the_data_model_does_count_the_number_of_records_in_a_tfrecords_file(self):
         subject = self.dataset
         
         expected_records = 16
-        self.assertEquals(expected_records, self.dataset.full_dataset_size)
+        self.assertEqual(expected_records, self.dataset.full_dataset_size)
         
     def test_the_data_model_gets_a_training_batch_as_a_dict_of_tensors(self):
         subject = self.dataset.get_training_batch_as_tensor_dict()['x']
         
         expected_class = tf.Tensor
-        self.assertEquals(expected_class, type(subject))
+        self.assertEqual(expected_class, type(subject))
         
     def test_the_data_model_gets_the_test_dataset_in_a_single_batch(self):
         dataset = self.dataset
