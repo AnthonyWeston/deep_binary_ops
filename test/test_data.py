@@ -1,11 +1,14 @@
 import tensorflow as tf
 from data import Data
 import numpy as np
+import os 
+
+test_file_path = os.path.dirname(os.path.realpath(__file__))
 
 class TestData(tf.test.TestCase):
     
     sess = None
-    test_filename_list = ['test_data.tfrecords']
+    test_filename_list = [os.path.join(test_file_path, 'test_data.tfrecords')]
     batch_size = 2
     training_size = 10
     
