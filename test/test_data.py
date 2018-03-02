@@ -89,6 +89,16 @@ class TestData(unittest.TestCase):
         expected_records = 16
         self.assertEquals(expected_records, self.dataset.full_dataset_size)
         
+    def test_the_data_model_gets_a_training_batch_as_a_dict_of_tensors(self):
+        subject = self.dataset.get_training_batch_as_tensor_dict()['x']
+        
+        expected_class = tf.Tensor
+        self.assertEquals(expected_class, type(subject))
+        
+        
+        
+        
+        
         
         
         

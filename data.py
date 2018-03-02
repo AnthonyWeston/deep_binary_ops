@@ -8,6 +8,7 @@ class Data:
         self.filenames = filename_list
         self.training_size = training_size
         self.batch_size = batch_size
+        self.num_batches = training_size / batch_size
         
         self.full_dataset = tf.data.TFRecordDataset(self.filenames).map(self._parse)
         self.full_dataset = self.full_dataset.shuffle(4096, seed = seed, reshuffle_each_iteration = True)
@@ -18,6 +19,10 @@ class Data:
         self.test_dataset = self.full_dataset.skip(training_size).take(-1).batch(
             self.full_dataset_size - self.training_size)
         self.test_iterator = self.test_dataset.make_one_shot_iterator()
+        
+    def get_training_batch_as_tensor_dict(self):
+        return self.training_iterator.get_next()
+
         
 
     @staticmethod
@@ -44,10 +49,9 @@ class Data:
 if __name__ == '__main__':
     
     dataset= Data(['test/test_data.tfrecords'], 10, 2, 0)
-    print(dataset.full_dataset)
-    print(dataset.training_dataset)
-    print(type(dataset.test_dataset))
+    print(type(dataset.training_iterator.get_next()['x']))
     
     with tf.Session() as sess:
-        print(sess.run(dataset.test_iterator.get_next()))
+        for _ in range(1):
+            print(sess.run(dataset.training_iterator.get_next()))
     
