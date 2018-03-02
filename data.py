@@ -15,7 +15,8 @@ class Data:
         self.training_dataset = self.full_dataset.take(training_size).batch(self.batch_size)
         self.training_iterator = self.training_dataset.make_one_shot_iterator()
         
-        self.test_dataset = self.full_dataset.skip(training_size).take(-1)
+        self.test_dataset = self.full_dataset.skip(training_size).take(-1).batch(
+            self.full_dataset_size - self.training_size)
         self.test_iterator = self.test_dataset.make_one_shot_iterator()
         
 

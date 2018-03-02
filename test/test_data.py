@@ -74,7 +74,7 @@ class TestData(unittest.TestCase):
     def test_the_data_model_is_split_into_a_test_dataset(self):
         subject = self.dataset.test_dataset
         
-        expected_class = type(tf.data.TFRecordDataset(TestData.test_filename_list).take(-1))
+        expected_class = type(tf.data.TFRecordDataset(TestData.test_filename_list).take(-1).batch(2))
         self.assertEquals(expected_class, type(subject))
         
     def test_the_data_model_can_count_the_number_of_records_in_a_tfrecords_file(self):
