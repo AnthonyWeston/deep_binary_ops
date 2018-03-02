@@ -1,9 +1,8 @@
-import unittest
 import tensorflow as tf
 from data import Data
 import numpy as np
 
-class TestData(unittest.TestCase):
+class TestData(tf.test.TestCase):
     
     sess = None
     test_filename_list = ['test_data.tfrecords']
@@ -12,7 +11,7 @@ class TestData(unittest.TestCase):
     
     @classmethod
     def setUpClass(cls):
-        sess = tf.Session()
+        TestData.sess = tf.Session()
     
     def setUp(self):
         self.tfrecord_dataset = tf.data.TFRecordDataset(['test/test_data.tfrecords'])
@@ -95,6 +94,13 @@ class TestData(unittest.TestCase):
         expected_class = tf.Tensor
         self.assertEquals(expected_class, type(subject))
         
+    def test_the_data_model_gets_the_test_dataset_in_a_single_batch(self):
+        dataset = self.dataset
+        subject = dataset.get_test_dataset_as_tensor_dict()['x']
+        
+        expected_batch_size = dataset.test_dataset_size
+        actual_batch_size = TestData.sess.run(subject)
+        self.assertAllEqual(expected_batch_size, actual_batch_size.shape[0])
         
         
         

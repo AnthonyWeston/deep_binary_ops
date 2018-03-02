@@ -4,6 +4,7 @@ class Data:
     
     def __init__(self, filename_list: list, training_size: int, batch_size: int, seed = 0):
         self.full_dataset_size = Data._dataset_size(filename_list)
+        self.test_dataset_size = self.full_dataset_size - training_size
         
         self.filenames = filename_list
         self.training_size = training_size
@@ -22,6 +23,9 @@ class Data:
         
     def get_training_batch_as_tensor_dict(self):
         return self.training_iterator.get_next()
+    
+    def get_test_dataset_as_tensor_dict(self):
+        return self.test_iterator.get_next()
 
         
 
@@ -45,6 +49,10 @@ class Data:
     
     
     
+    
+"""
+Code sandbox for figuring stuff out
+"""
     
 if __name__ == '__main__':
     
