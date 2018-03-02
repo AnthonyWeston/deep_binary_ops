@@ -6,7 +6,7 @@ import numpy as np
 class TestData(unittest.TestCase):
     
     sess = None
-    test_filename_list = ['test/test_data.tfrecords']
+    test_filename_list = ['test_data.tfrecords']
     batch_size = 2
     training_size = 10
     
@@ -68,7 +68,7 @@ class TestData(unittest.TestCase):
     def test_the_data_model_is_split_into_a_training_dataset(self):
         subject = self.dataset.training_dataset
         
-        expected_class = type(tf.data.TFRecordDataset(TestData.test_filename_list).take(-1))
+        expected_class = type(tf.data.TFRecordDataset(TestData.test_filename_list).take(-1).batch(2))
         self.assertEquals(expected_class, type(subject))
         
     def test_the_data_model_is_split_into_a_test_dataset(self):
@@ -77,6 +77,11 @@ class TestData(unittest.TestCase):
         expected_class = type(tf.data.TFRecordDataset(TestData.test_filename_list).take(-1))
         self.assertEquals(expected_class, type(subject))
         
+    def test_the_data_model_counts_the_number_of_records_in_a_tfrecords_file(self):
+        subject = TestData.test_filename_list
+        
+        expected_records = 16
+        self.assertEquals(expected_records, Data._dataset_size(subject))
         
         
         

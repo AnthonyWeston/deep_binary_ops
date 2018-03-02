@@ -35,4 +35,4 @@ def generate_training_example(x, y, op):
 
 
 if __name__ == '__main__':
-    generate_training_data()
+    generate_training_data(3, [dg.add_op], 'test/')
