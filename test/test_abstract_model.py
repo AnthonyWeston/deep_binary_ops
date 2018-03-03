@@ -11,12 +11,14 @@ class TestAbstractModelBuilder(unittest.TestCase):
     training_size = 10
     batch_size = 2
     seed = 1
+    learning_rate = 0.001
     
     def setUp(self):
         self.modelbuilder = AbstractModelBuilder(filename_list = TestAbstractModelBuilder.test_filename_list,
             training_size = TestAbstractModelBuilder.training_size,
             batch_size = TestAbstractModelBuilder.batch_size,
-            seed = TestAbstractModelBuilder.seed)
+            seed = TestAbstractModelBuilder.seed,
+            learning_rate = TestAbstractModelBuilder.learning_rate)
     
     def test_the_abstract_model_builder_is_created_with_a_list_of_data_filenames(self):
         subject = self.modelbuilder
@@ -41,3 +43,22 @@ class TestAbstractModelBuilder(unittest.TestCase):
         
         expected_seed = TestAbstractModelBuilder.seed
         self.assertEqual(expected_seed, subject.seed)
+        
+    def test_the_abstract_model_builder_is_created_with_a_learning_rate(self):
+        subject = self.modelbuilder
+        
+        expected_learning_rate = TestAbstractModelBuilder.learning_rate
+        self.assertEqual(expected_learning_rate, subject.learning_rate)
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
