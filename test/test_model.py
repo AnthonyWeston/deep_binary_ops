@@ -99,7 +99,16 @@ class TestModel(tf.test.TestCase):
         expected_layer_depth = TestModel.layer_depth
         self.assertEqual(expected_layer_depth, subject.layer_depth)   
         
+    def test_the_model_has_an_x_placeholder_with_8_bits(self):
+        subject = self.model.x
+
+        expected_bits = Model.BITS_PER_NUMBER
+        self.assertEqual(expected_bits, subject.shape[1])
         
-        
+    def test_the_model_has_a_y_placeholder_with_8_bits(self):
+        subject = self.model.y
+
+        expected_bits = Model.BITS_PER_NUMBER
+        self.assertEqual(expected_bits, subject.shape[1])
         
         
