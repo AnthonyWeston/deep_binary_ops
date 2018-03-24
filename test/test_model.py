@@ -111,4 +111,10 @@ class TestModel(tf.test.TestCase):
         expected_bits = Model.BITS_PER_NUMBER
         self.assertEqual(expected_bits, subject.shape[1])
         
+    def test_the_model_has_a_training_mode_placeholder(self):
+        subject = self.model.training_phase
+        
+        expected_dtype = tf.bool
+        self.assertEquals(expected_dtype, subject.dtype)
+        
         
