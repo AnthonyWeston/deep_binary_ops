@@ -14,6 +14,8 @@ class TestModel(tf.test.TestCase):
     initial_learning_rate = 0.0005
     dropout_rate = .1
     regularization_scale = 0.01
+    layer_size = 4
+    layer_depth = 5
     
     @classmethod
     def setUpClass(cls):
@@ -26,7 +28,9 @@ class TestModel(tf.test.TestCase):
             seed = TestModel.seed,
             initial_learning_rate = TestModel.initial_learning_rate,
             dropout_rate = TestModel.dropout_rate,
-            regularization_scale = TestModel.regularization_scale)
+            regularization_scale = TestModel.regularization_scale,
+            layer_size = TestModel.layer_size,
+            layer_depth = TestModel.layer_depth)
     
     def test_the_model_is_created_with_a_list_of_data_filenames(self):
         subject = self.model
@@ -83,8 +87,17 @@ class TestModel(tf.test.TestCase):
         
         self.assertEqual(TestModel.sess.run(expected_decay), TestModel.sess.run(subject.learning_rate))
         
+    def test_the_model_is_created_with_a_layer_size(self):
+        subject = self.model
         
+        expected_layer_size = TestModel.layer_size
+        self.assertEqual(expected_layer_size, subject.layer_size)
         
+    def test_the_model_is_created_with_a_layer_depth(self):
+        subject = self.model
+        
+        expected_layer_depth = TestModel.layer_depth
+        self.assertEqual(expected_layer_depth, subject.layer_depth)   
         
         
         

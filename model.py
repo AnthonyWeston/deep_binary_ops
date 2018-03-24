@@ -3,7 +3,8 @@ import tensorflow as tf
 class Model:
     
     def __init__(self, filename_list: list, training_size: int, batch_size: int, seed: int,
-                initial_learning_rate: float, dropout_rate: int, regularization_scale: int):
+                initial_learning_rate: float, dropout_rate: int, regularization_scale: int,
+                layer_size: int, layer_depth: int):
         self.filename_list = filename_list
         self.training_size = training_size
         self.batch_size = batch_size
@@ -17,4 +18,7 @@ class Model:
         
         self.dropout_rate = dropout_rate
         self.regularization_scale = regularization_scale
+        
+        self.layer_size = layer_size
+        self.layer_depth = layer_depth
         
