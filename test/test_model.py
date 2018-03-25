@@ -16,6 +16,7 @@ class TestModel(tf.test.TestCase):
     regularization_scale = 0.01
     layer_size = 4
     layer_depth = 5
+    hidden_layer_activation = tf.nn.leaky_relu
     
     @classmethod
     def setUpClass(cls):
@@ -30,7 +31,8 @@ class TestModel(tf.test.TestCase):
             dropout_rate = TestModel.dropout_rate,
             regularization_scale = TestModel.regularization_scale,
             layer_size = TestModel.layer_size,
-            layer_depth = TestModel.layer_depth)
+            layer_depth = TestModel.layer_depth,
+            hidden_layer_activation = TestModel.hidden_layer_activation)
     
     def test_the_model_is_created_with_a_list_of_data_filenames(self):
         subject = self.model
@@ -116,5 +118,11 @@ class TestModel(tf.test.TestCase):
         
         expected_dtype = tf.bool
         self.assertEquals(expected_dtype, subject.dtype)
+        
+    def test_the_model_is_created_with_a_hidden_layer_activation_function(self):
+        subject = self.model
+
+        expected_activation_function = TestModel.hidden_layer_activation
+        self.assertEqual(expected_activation_function, subject.hidden_layer_activation/)
         
         

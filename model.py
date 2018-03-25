@@ -6,7 +6,7 @@ class Model:
     
     def __init__(self, filename_list: list, training_size: int, batch_size: int, seed: int,
                 initial_learning_rate: float, dropout_rate: int, regularization_scale: int,
-                layer_size: int, layer_depth: int):
+                layer_size: int, layer_depth: int, hidden_layer_activation):
         self.filename_list = filename_list
         self.training_size = training_size
         self.batch_size = batch_size
@@ -15,6 +15,7 @@ class Model:
         self.regularization_scale = regularization_scale
         self.layer_size = layer_size
         self.layer_depth = layer_depth
+        self.hidden_layer_activation = hidden_layer_activation
         
         self.initial_learning_rate = initial_learning_rate
         self.learning_rate_global_step = tf.Variable(0, trainable=False)
@@ -25,19 +26,64 @@ class Model:
         self.x = tf.placeholder(tf.float32, shape = [None, Model.BITS_PER_NUMBER], name = 'X_input')
         self.y = tf.placeholder(tf.float32, shape = [None, Model.BITS_PER_NUMBER], name = 'Y_input')
         
-        self.input = tf.concat([self.x, self.y], 1, 'ConcatenatedInput')
+        self.inputs = tf.concat([self.x, self.y], 1, 'ConcatenatedInput')
         
         self.training_phase = tf.placeholder(tf.bool)
         
-    
-    
-    def hidden_layer(self, inputs):
-        self.hidden_layer_1 = tf.layers.dense(input, self.layer_size, activation = None, 
-            kernel_regularizer = tf.contrib.layers.l2_regularizer(regularization_scale), 
-            activity_regularizer = tf.contrib.layers.l2_regularizer(regularization_scale=0.1))
+        self.hidden_layer = self.create_hidden_layer(self.inputs)
         
-        self.batch_norm_layer_1 = tf.layers.batch_normalization(self.hidden_layer_1, training = self.training_phase)
-        self.dropout_layer_1 = tf.layers.dropout(self.batch_norm_layer_1, dropout_rate, training = self.training_phase, name = 'Dropout1')
-        #self.leaky_relu_1 = tf.nn.leaky_relu(self.dropout_layer_1, alpha = 0.05, name = 'LeakyRelu1')
-        self.sigmoid_1 = tf.nn.sigmoid(self.dropout_layer_1, name = 'Sigmoid1')
+
+    
+    def create_hidden_layer(self, inputs):
+        hidden_layer = tf.layers.dense(inputs, self.layer_size, activation = None, 
+            kernel_regularizer = tf.contrib.layers.l2_regularizer(self.regularization_scale), 
+            activity_regularizer = tf.contrib.layers.l2_regularizer(self.regularization_scale),
+            kernel_initializer = tf.initializers.random_normal(self.seed))
+        
+        batch_norm_layer = tf.layers.batch_normalization(hidden_layer, training = self.training_phase)
+        
+        dropout_layer = tf.layers.dropout(batch_norm_layer, self.dropout_rate, 
+            training = self.training_phase)
+        
+        output = self.hidden_layer_activation(dropout_layer)
+        
+        return output
+    
+"""
+For manual testing of the model
+"""
+    
+if __name__ == '__main__':
+    model = Model(filename_list = 'data.txt',
+        training_size = 100,
+        batch_size = 10,
+        seed = 0,
+        initial_learning_rate = .05,
+        dropout_rate = .5,
+        regularization_scale = .1,
+        layer_size = 10,
+        layer_depth = 3,
+        hidden_layer_activation = tf.nn.tanh
+        )
+    
+    sess = tf.Session()
+    init = tf.global_variables_initializer()
+    sess.run(init)
+    
+    features = [[0 for _ in range(8)], [1 for _ in range(8)]]
+    
+    
+    print(sess.run(model.hidden_layer, feed_dict = {model.x: features,
+                                            model.y: features,
+                                            model.training_phase: True}))
+    for _ in range(10):
+        print(sess.run(model.hidden_layer, feed_dict = {model.x: features,
+                                            model.y: features,
+                                            model.training_phase: False}))
+
+
+
+
+
+
 
