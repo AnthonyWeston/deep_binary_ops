@@ -30,17 +30,15 @@ class Model:
         
         self.training_phase = tf.placeholder(tf.bool)
         
-        self.hidden_layer = self.create_hidden_layer(self.inputs)
-        
-
-    
-    def create_hidden_layer(self, inputs):
-        hidden_layer = tf.layers.dense(inputs, self.layer_size, activation = None, 
+        self.hidden_layers = self._build_hidden_layers()
+            
+    def _create_hidden_layer(self, inputs):
+        dense_layer = tf.layers.dense(inputs, self.layer_size, activation = None, 
             kernel_regularizer = tf.contrib.layers.l2_regularizer(self.regularization_scale), 
             activity_regularizer = tf.contrib.layers.l2_regularizer(self.regularization_scale),
             kernel_initializer = tf.initializers.random_normal(self.seed))
         
-        batch_norm_layer = tf.layers.batch_normalization(hidden_layer, training = self.training_phase)
+        batch_norm_layer = tf.layers.batch_normalization(dense_layer, training = self.training_phase)
         
         dropout_layer = tf.layers.dropout(batch_norm_layer, self.dropout_rate, 
             training = self.training_phase)
@@ -48,6 +46,16 @@ class Model:
         output = self.hidden_layer_activation(dropout_layer)
         
         return output
+    
+    def _build_hidden_layers(self):
+        hidden_layers = [None for _ in range(self.layer_depth)]
+        
+        hidden_layers[0] = self._create_hidden_layer(self.inputs)
+        
+        for i in range(self.layer_depth - 1):
+            hidden_layers[i + 1] = self._create_hidden_layer(hidden_layers[i])
+            
+        return hidden_layers
     
 """
 For manual testing of the model
@@ -73,13 +81,15 @@ if __name__ == '__main__':
     features = [[0 for _ in range(8)], [1 for _ in range(8)]]
     
     
-    print(sess.run(model.hidden_layer, feed_dict = {model.x: features,
+    print(sess.run(model.hidden_layers, feed_dict = {model.x: features,
                                             model.y: features,
                                             model.training_phase: True}))
     for _ in range(10):
-        print(sess.run(model.hidden_layer, feed_dict = {model.x: features,
+        print(sess.run(model.hidden_layers, feed_dict = {model.x: features,
                                             model.y: features,
                                             model.training_phase: False}))
+        
+    
 
 
 
