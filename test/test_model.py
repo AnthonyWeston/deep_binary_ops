@@ -1,6 +1,7 @@
 import os
 from model import Model
 import tensorflow as tf
+from data import Data
 
 test_file_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -117,12 +118,17 @@ class TestModel(tf.test.TestCase):
         subject = self.model.training_phase
         
         expected_dtype = tf.bool
-        self.assertEquals(expected_dtype, subject.dtype)
+        self.assertEqual(expected_dtype, subject.dtype)
         
     def test_the_model_is_created_with_a_hidden_layer_activation_function(self):
         subject = self.model
 
         expected_activation_function = TestModel.hidden_layer_activation
-        self.assertEqual(expected_activation_function, subject.hidden_layer_activation/)
+        self.assertEqual(expected_activation_function, subject.hidden_layer_activation)
+        
+    def test_the_model_has_a_data_object(self):
+        subject = self.model
+
+        self.assertIsInstance(subject.data, Data)
         
         

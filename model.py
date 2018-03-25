@@ -1,4 +1,5 @@
 import tensorflow as tf
+from data import Data
 
 class Model:
     
@@ -28,16 +29,21 @@ class Model:
         self.z = tf.placeholder(tf.float32, shape = [None, Model.BITS_PER_NUMBER], name = 'Labels')
         self.training_phase = tf.placeholder(tf.bool)
         
-        self.inputs = tf.concat([self.x, self.y], 1, 'ConcatenatedInput')
+        inputs = tf.concat([self.x, self.y], 1, 'ConcatenatedInput')
 
-        
-        self.hidden_layers = self._build_hidden_layers()
+        self.hidden_layers = self._build_hidden_layers(inputs)
         
         self.logits = tf.layers.dense(inputs = self.hidden_layers[-1], units = Model.BITS_PER_NUMBER,
             activation = self.hidden_layer_activation)
         self.probabilities = tf.sigmoid(self.logits)
         
         self.loss = tf.losses.sigmoid_cross_entropy(self.z, self.logits)
+        self.optimizer = tf.train.AdamOptimizer(learning_rate = self.learning_rate, 
+            name = "AdamOptimizer").minimize(self.loss, global_step = self.learning_rate_global_step)
+            
+        self.data = Data(filename_list = self.filename_list, training_size = self.training_size, 
+            batch_size = self.batch_size)
+        
             
     def _create_hidden_layer(self, inputs):
         dense_layer = tf.layers.dense(inputs, self.layer_size, activation = None, 
@@ -54,11 +60,11 @@ class Model:
         
         return output
     
-    def _build_hidden_layers(self):
+    def _build_hidden_layers(self, inputs):
         hidden_layers = [None for _ in range(self.layer_depth)]
         
         
-        hidden_layers[0] = self._create_hidden_layer(self.inputs)
+        hidden_layers[0] = self._create_hidden_layer(inputs)
         
         for i in range(self.layer_depth - 1):
             hidden_layers[i + 1] = self._create_hidden_layer(hidden_layers[i])
@@ -70,7 +76,7 @@ For manual testing of the model
 """
     
 if __name__ == '__main__':
-    model = Model(filename_list = 'data.txt',
+    model = Model(filename_list = ['training_data/add_op_data.tfrecords'],
         training_size = 100,
         batch_size = 10,
         seed = 0,
