@@ -31,6 +31,10 @@ class Model:
         self.training_phase = tf.placeholder(tf.bool)
         
         self.hidden_layers = self._build_hidden_layers()
+        
+        self.logits = tf.layers.dense(inputs = self.hidden_layers[-1], units = Model.BITS_PER_NUMBER,
+            activation = self.hidden_layer_activation)
+        self.probabilities = tf.sigmoid(self.logits)
             
     def _create_hidden_layer(self, inputs):
         dense_layer = tf.layers.dense(inputs, self.layer_size, activation = None, 
@@ -49,6 +53,7 @@ class Model:
     
     def _build_hidden_layers(self):
         hidden_layers = [None for _ in range(self.layer_depth)]
+        
         
         hidden_layers[0] = self._create_hidden_layer(self.inputs)
         
@@ -84,8 +89,8 @@ if __name__ == '__main__':
     print(sess.run(model.hidden_layers, feed_dict = {model.x: features,
                                             model.y: features,
                                             model.training_phase: True}))
-    for _ in range(10):
-        print(sess.run(model.hidden_layers, feed_dict = {model.x: features,
+
+    print(sess.run([model.logits, model.probabilities], feed_dict = {model.x: features,
                                             model.y: features,
                                             model.training_phase: False}))
         
