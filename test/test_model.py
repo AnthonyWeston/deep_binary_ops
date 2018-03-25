@@ -132,7 +132,7 @@ class TestModel(tf.test.TestCase):
 
         self.assertIsInstance(subject.data, Data)
         
-    def test_the_model_is_trained(self):
+    def test_when_the_model_is_trained_its_loss_decreases(self):
         subject = self.model
         
         TestModel.sess.run(tf.global_variables_initializer())    
@@ -143,5 +143,17 @@ class TestModel(tf.test.TestCase):
         final_loss = subject.evaluate_loss('train')
         
         self.assertLessEqual(final_loss, initial_loss)
+        
+    def test_when_the_model_is_trained_its_accuracy_increases(self):
+        subject = self.model
+        
+        TestModel.sess.run(tf.global_variables_initializer())    
+        
+        initial_accuracy = subject.evaluate_accuracy('train')
+        for _ in range(50):
+            subject.train_for_one_epoch()
+        final_accuracy = subject.evaluate_accuracy('train')
+        
+        self.assertGreaterEqual(final_accuracy, initial_accuracy)
         
         

@@ -46,6 +46,10 @@ class Model:
         
         self.sess = sess
         
+        self.predictions = tf.round(self.probabilities, name = 'Predictions')
+        self.prediction_accuracy = tf.reduce_mean(tf.to_float(tf.equal(self.predictions, self.y)),
+            name = 'Accuracy')
+        
     def evaluate_loss(self, dataset_type: str):
         sess = self.sess
         
@@ -55,6 +59,19 @@ class Model:
             feature_dict = sess.run(self.data.get_test_dataset_as_tensor_dict())
 
         return sess.run(self.loss, feed_dict = {self.x: feature_dict['x'],
+                                            self.y: feature_dict['y'],
+                                            self.z: feature_dict['z'],
+                                            self.training_phase: False})
+        
+    def evaluate_accuracy(self, dataset_type: str):
+        sess = self.sess
+        
+        if dataset_type == 'train':
+            feature_dict = sess.run(self.data.get_training_dataset_as_tensor_dict())
+        elif dataset_type == 'test':
+            feature_dict = sess.run(self.data.get_test_dataset_as_tensor_dict())
+            
+        return sess.run(self.prediction_accuracy, feed_dict = {self.x: feature_dict['x'],
                                             self.y: feature_dict['y'],
                                             self.z: feature_dict['z'],
                                             self.training_phase: False})
