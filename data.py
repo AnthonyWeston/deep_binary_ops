@@ -14,15 +14,21 @@ class Data:
         self.full_dataset = tf.data.TFRecordDataset(self.filenames).map(self._parse)
         self.full_dataset = self.full_dataset.shuffle(4096, seed = seed, reshuffle_each_iteration = True)
         
-        self.training_dataset = self.full_dataset.take(training_size).batch(self.batch_size)
-        self.training_iterator = self.training_dataset.make_one_shot_iterator()
+        self.training_dataset = self.full_dataset.take(training_size)
+        self.training_iterator = self.training_dataset.batch(self.training_size).make_one_shot_iterator()
+        
+        self.training_batch_dataset = self.training_dataset.batch(self.batch_size)
+        self.training_batch_iterator = self.training_batch_dataset.make_one_shot_iterator()
         
         self.test_dataset = self.full_dataset.skip(training_size).take(-1).batch(
             self.full_dataset_size - self.training_size)
         self.test_iterator = self.test_dataset.make_one_shot_iterator()
         
-    def get_training_batch_as_tensor_dict(self):
+    def get_training_dataset_as_tensor_dict(self):
         return self.training_iterator.get_next()
+        
+    def get_training_batch_as_tensor_dict(self):
+        return self.training_batch_iterator.get_next()
     
     def get_test_dataset_as_tensor_dict(self):
         return self.test_iterator.get_next()

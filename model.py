@@ -7,7 +7,7 @@ class Model:
     
     def __init__(self, filename_list: list, training_size: int, batch_size: int, seed: int,
                 initial_learning_rate: float, dropout_rate: int, regularization_scale: int,
-                layer_size: int, layer_depth: int, hidden_layer_activation):
+                layer_size: int, layer_depth: int, hidden_layer_activation, sess: tf.Session):
         self.filename_list = filename_list
         self.training_size = training_size
         self.batch_size = batch_size
@@ -44,6 +44,17 @@ class Model:
         self.data = Data(filename_list = self.filename_list, training_size = self.training_size, 
             batch_size = self.batch_size)
         
+        self.sess = sess
+        
+    def evaluate_loss(self, dataset):
+        feature_dict = sess.run(model.data.get_training_dataset_as_tensor_dict())
+        
+        print(sess.run(model.loss, feed_dict = {model.x: feature_dict['x'],
+                                            model.y: feature_dict['y'],
+                                            model.z: feature_dict['z'],
+                                            model.training_phase: False}))
+
+        
             
     def _create_hidden_layer(self, inputs):
         dense_layer = tf.layers.dense(inputs, self.layer_size, activation = None, 
@@ -76,37 +87,33 @@ For manual testing of the model
 """
     
 if __name__ == '__main__':
+        
+    sess = tf.Session()
+
     model = Model(filename_list = ['training_data/add_op_data.tfrecords'],
-        training_size = 100,
-        batch_size = 10,
+        training_size = 63488,
+        batch_size = 3,
         seed = 0,
         initial_learning_rate = .05,
         dropout_rate = .5,
         regularization_scale = .1,
         layer_size = 10,
         layer_depth = 3,
-        hidden_layer_activation = tf.nn.tanh
+        hidden_layer_activation = tf.nn.tanh,
+        sess = sess
         )
-    
-    sess = tf.Session()
+
     init = tf.global_variables_initializer()
     sess.run(init)
     
-    features = [[0 for _ in range(8)], [1 for _ in range(8)]]
-    labels = [[1, 0, 1, 1, 0, 1, 1, 0], [1, 0, 1, 0, 1, 0, 1, 0]]
-    
-    
-    print(sess.run(model.hidden_layers, feed_dict = {model.x: features,
-                                            model.y: features,
-                                            model.z: labels,
+    feature_dict = sess.run(model.data.get_training_dataset_as_tensor_dict())
+    print(feature_dict)
+        
+    print(sess.run(model.loss, feed_dict = {model.x: feature_dict['x'],
+                                            model.y: feature_dict['y'],
+                                            model.z: feature_dict['z'],
                                             model.training_phase: True}))
 
-    print(sess.run([model.logits, model.probabilities, model.loss], feed_dict = {model.x: features,
-                                            model.y: features,
-                                            model.z: labels,
-                                            model.training_phase: False}))
-        
-    
 
 
 

@@ -33,7 +33,8 @@ class TestModel(tf.test.TestCase):
             regularization_scale = TestModel.regularization_scale,
             layer_size = TestModel.layer_size,
             layer_depth = TestModel.layer_depth,
-            hidden_layer_activation = TestModel.hidden_layer_activation)
+            hidden_layer_activation = TestModel.hidden_layer_activation,
+            sess = TestModel.sess)
     
     def test_the_model_is_created_with_a_list_of_data_filenames(self):
         subject = self.model

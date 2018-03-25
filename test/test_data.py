@@ -70,7 +70,7 @@ class TestData(tf.test.TestCase):
     def test_the_data_model_is_split_into_a_training_dataset(self):
         subject = self.dataset.training_dataset
         
-        expected_class = type(tf.data.TFRecordDataset(TestData.test_filename_list).take(-1).batch(2))
+        expected_class = type(tf.data.TFRecordDataset(TestData.test_filename_list).take(-1))
         self.assertEqual(expected_class, type(subject))
         
     def test_the_data_model_is_split_into_a_test_dataset(self):
