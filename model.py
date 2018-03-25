@@ -25,16 +25,19 @@ class Model:
 
         self.x = tf.placeholder(tf.float32, shape = [None, Model.BITS_PER_NUMBER], name = 'X_input')
         self.y = tf.placeholder(tf.float32, shape = [None, Model.BITS_PER_NUMBER], name = 'Y_input')
+        self.z = tf.placeholder(tf.float32, shape = [None, Model.BITS_PER_NUMBER], name = 'Labels')
+        self.training_phase = tf.placeholder(tf.bool)
         
         self.inputs = tf.concat([self.x, self.y], 1, 'ConcatenatedInput')
-        
-        self.training_phase = tf.placeholder(tf.bool)
+
         
         self.hidden_layers = self._build_hidden_layers()
         
         self.logits = tf.layers.dense(inputs = self.hidden_layers[-1], units = Model.BITS_PER_NUMBER,
             activation = self.hidden_layer_activation)
         self.probabilities = tf.sigmoid(self.logits)
+        
+        self.loss = tf.losses.sigmoid_cross_entropy(self.z, self.logits)
             
     def _create_hidden_layer(self, inputs):
         dense_layer = tf.layers.dense(inputs, self.layer_size, activation = None, 
@@ -84,14 +87,17 @@ if __name__ == '__main__':
     sess.run(init)
     
     features = [[0 for _ in range(8)], [1 for _ in range(8)]]
+    labels = [[1, 0, 1, 1, 0, 1, 1, 0], [1, 0, 1, 0, 1, 0, 1, 0]]
     
     
     print(sess.run(model.hidden_layers, feed_dict = {model.x: features,
                                             model.y: features,
+                                            model.z: labels,
                                             model.training_phase: True}))
 
-    print(sess.run([model.logits, model.probabilities], feed_dict = {model.x: features,
+    print(sess.run([model.logits, model.probabilities, model.loss], feed_dict = {model.x: features,
                                             model.y: features,
+                                            model.z: labels,
                                             model.training_phase: False}))
         
     
