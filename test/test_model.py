@@ -15,13 +15,13 @@ class TestModel(tf.test.TestCase):
     initial_learning_rate = 0.0005
     dropout_rate = .1
     regularization_scale = 0.01
-    layer_size = 4
-    layer_depth = 5
+    layer_size = 24
+    layer_depth = 4
     hidden_layer_activation = tf.nn.leaky_relu
     
     @classmethod
     def setUpClass(cls):
-        TestModel.sess = tf.Session()    
+        TestModel.sess = tf.Session()
     
     def setUp(self):
         self.model = Model(filename_list = TestModel.test_filename_list,
@@ -131,5 +131,17 @@ class TestModel(tf.test.TestCase):
         subject = self.model
 
         self.assertIsInstance(subject.data, Data)
+        
+    def test_the_model_is_trained(self):
+        subject = self.model
+        
+        TestModel.sess.run(tf.global_variables_initializer())    
+        
+        initial_loss = subject.evaluate_loss('train')
+        for _ in range(2):
+            subject.train_for_one_epoch()
+        final_loss = subject.evaluate_loss('train')
+        
+        self.assertLessEqual(final_loss, initial_loss)
         
         

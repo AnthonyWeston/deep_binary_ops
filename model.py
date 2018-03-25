@@ -46,15 +46,27 @@ class Model:
         
         self.sess = sess
         
-    def evaluate_loss(self, dataset):
-        feature_dict = sess.run(model.data.get_training_dataset_as_tensor_dict())
+    def evaluate_loss(self, dataset_type: str):
+        sess = self.sess
         
-        print(sess.run(model.loss, feed_dict = {model.x: feature_dict['x'],
-                                            model.y: feature_dict['y'],
-                                            model.z: feature_dict['z'],
-                                            model.training_phase: False}))
+        if dataset_type == 'train':
+            feature_dict = sess.run(self.data.get_training_dataset_as_tensor_dict())
+        elif dataset_type == 'test':
+            feature_dict = sess.run(self.data.get_test_dataset_as_tensor_dict())
 
-        
+        return sess.run(self.loss, feed_dict = {self.x: feature_dict['x'],
+                                            self.y: feature_dict['y'],
+                                            self.z: feature_dict['z'],
+                                            self.training_phase: False})
+
+    def train_for_one_epoch(self):
+        for _ in range(self.data.num_batches): 
+            feature_dict = self.sess.run(self.data.get_training_batch_as_tensor_dict())
+
+            self.sess.run(self.optimizer, feed_dict = {self.x: feature_dict['x'],
+                                            self.y: feature_dict['y'],
+                                            self.z: feature_dict['z'],
+                                            self.training_phase: True})
             
     def _create_hidden_layer(self, inputs):
         dense_layer = tf.layers.dense(inputs, self.layer_size, activation = None, 
@@ -92,13 +104,13 @@ if __name__ == '__main__':
 
     model = Model(filename_list = ['training_data/add_op_data.tfrecords'],
         training_size = 63488,
-        batch_size = 3,
+        batch_size = 1024,
         seed = 0,
-        initial_learning_rate = .05,
-        dropout_rate = .5,
+        initial_learning_rate = .005,
+        dropout_rate = .125,
         regularization_scale = .1,
-        layer_size = 10,
-        layer_depth = 3,
+        layer_size = 20,
+        layer_depth = 4,
         hidden_layer_activation = tf.nn.tanh,
         sess = sess
         )
@@ -112,11 +124,13 @@ if __name__ == '__main__':
     print(sess.run(model.loss, feed_dict = {model.x: feature_dict['x'],
                                             model.y: feature_dict['y'],
                                             model.z: feature_dict['z'],
-                                            model.training_phase: True}))
+                                            model.training_phase: False}))
 
+    model.evaluate_loss('train')
+    
+    model.train_for_one_epoch()
 
-
-
+    model.evaluate_loss('train')
 
 
 

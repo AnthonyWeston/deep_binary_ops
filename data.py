@@ -1,18 +1,21 @@
 import tensorflow as tf
+from tensorflow.python.framework.errors_impl import OutOfRangeError
 
 class Data:
     
     def __init__(self, filename_list: list, training_size: int, batch_size: int, seed = 0):
+        self.seed = seed
         self.full_dataset_size = Data._dataset_size(filename_list)
         self.test_dataset_size = self.full_dataset_size - training_size
         
         self.filenames = filename_list
         self.training_size = training_size
         self.batch_size = batch_size
-        self.num_batches = training_size / batch_size
+        self.num_batches = training_size // batch_size
         
         self.full_dataset = tf.data.TFRecordDataset(self.filenames).map(self._parse)
-        self.full_dataset = self.full_dataset.shuffle(4096, seed = seed, reshuffle_each_iteration = True)
+        self.full_dataset = self.full_dataset.shuffle(self.full_dataset_size, seed = seed, 
+            reshuffle_each_iteration = True)
         
         self.training_dataset = self.full_dataset.take(training_size)
         self.training_iterator = self.training_dataset.batch(self.training_size).make_one_shot_iterator()
@@ -24,12 +27,26 @@ class Data:
             self.full_dataset_size - self.training_size)
         self.test_iterator = self.test_dataset.make_one_shot_iterator()
         
-    def get_training_dataset_as_tensor_dict(self):
-        return self.training_iterator.get_next()
+        self.current_batch = 0
         
-    def get_training_batch_as_tensor_dict(self):
-        return self.training_batch_iterator.get_next()
-    
+    def get_training_dataset_as_tensor_dict(self):
+        self.training_dataset = self.training_dataset.shuffle(self.training_size, seed = self.seed, 
+            reshuffle_each_iteration = True)
+        self.training_iterator = self.training_dataset.batch(self.training_size).make_one_shot_iterator()
+        return self.training_iterator.get_next()
+
+        
+    def get_training_batch_as_tensor_dict(self):       
+        batch = self.training_batch_iterator.get_next()
+        self.current_batch += 1
+        
+        if self.current_batch == self.num_batches:
+            self.training_batch_dataset = self.training_dataset.batch(self.batch_size)
+            self.training_batch_iterator = self.training_batch_dataset.make_one_shot_iterator()
+            self.current_batch = 0
+            
+        return batch
+        
     def get_test_dataset_as_tensor_dict(self):
         return self.test_iterator.get_next()
 
