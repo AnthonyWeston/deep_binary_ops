@@ -1,5 +1,5 @@
 import tensorflow as tf
-from tensorflow.python.framework.errors_impl import OutOfRangeError
+import numpy as np
 
 class Data:
     
@@ -18,37 +18,40 @@ class Data:
             reshuffle_each_iteration = True)
         
         self.training_dataset = self.full_dataset.take(training_size)
-        self.training_iterator = self.training_dataset.batch(self.training_size).make_one_shot_iterator()
-        
-        self.training_batch_dataset = self.training_dataset.batch(self.batch_size)
-        self.training_batch_iterator = self.training_batch_dataset.make_one_shot_iterator()
+        training_iterator = self.training_dataset.batch(self.training_size).make_one_shot_iterator()
         
         self.test_dataset = self.full_dataset.skip(training_size).take(-1).batch(
-            self.full_dataset_size - self.training_size)
-        self.test_iterator = self.test_dataset.make_one_shot_iterator()
+            self.test_dataset_size)
+        test_iterator = self.test_dataset.make_one_shot_iterator()
         
-        self.current_batch = 0
+        sess = tf.Session()
+        sess.run(tf.global_variables_initializer())
         
-    def get_training_dataset_as_tensor_dict(self):
-        self.training_dataset = self.training_dataset.shuffle(self.training_size, seed = self.seed, 
-            reshuffle_each_iteration = True)
-        self.training_iterator = self.training_dataset.batch(self.training_size).make_one_shot_iterator()
-        return self.training_iterator.get_next()
+        self.training_dataset = sess.run(training_iterator.get_next())
+        self.test_dataset = sess.run(test_iterator.get_next())
+        
+        self.batch_num = 0
+        
+    def get_training_dataset_as_dict(self):
+        return self.training_dataset
 
         
-    def get_training_batch_as_tensor_dict(self):       
-        batch = self.training_batch_iterator.get_next()
-        self.current_batch += 1
-        
-        if self.current_batch == self.num_batches:
-            self.training_batch_dataset = self.training_dataset.batch(self.batch_size)
-            self.training_batch_iterator = self.training_batch_dataset.make_one_shot_iterator()
-            self.current_batch = 0
+    def get_training_batch_as_dict(self):   
+        batch_start_index = self.batch_num * self.batch_size
+        batch_end_index = batch_start_index + self.batch_size
             
+        batch = {'x': self.training_dataset['x'][batch_start_index: batch_end_index],
+                 'y': self.training_dataset['y'][batch_start_index: batch_end_index],
+                 'z': self.training_dataset['z'][batch_start_index: batch_end_index]}
+        
+        self.batch_num = (self.batch_num + 1 % self.num_batches)
+        if(self.batch_num == 0):
+            self.shuffle_training_dataset()
+        
         return batch
         
-    def get_test_dataset_as_tensor_dict(self):
-        return self.test_iterator.get_next()
+    def get_test_dataset_as_dict(self):
+        return self.test_dataset
 
         
 
@@ -70,8 +73,10 @@ class Data:
         parsed_features = tf.parse_single_example(dataset, features)
         return parsed_features
     
-    
-    
+    def shuffle_training_dataset(self):
+        for key in self.training_dataset.keys():
+            np.random.seed(seed = 0)
+            np.random.shuffle(self.training_dataset[key])
     
 """
 Code sandbox for figuring stuff out
@@ -80,9 +85,5 @@ Code sandbox for figuring stuff out
 if __name__ == '__main__':
     
     dataset= Data(['test/test_data.tfrecords'], 10, 2, 0)
-    print(type(dataset.training_iterator.get_next()['x']))
-    
-    with tf.Session() as sess:
-        for _ in range(1):
-            print(sess.run(dataset.training_iterator.get_next()))
+    print(dataset.get_training_dataset_as_tensor_dict()['x'][0:5])
     

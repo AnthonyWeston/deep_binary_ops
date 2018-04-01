@@ -70,13 +70,13 @@ class TestData(tf.test.TestCase):
     def test_the_data_model_is_split_into_a_training_dataset(self):
         subject = self.dataset.training_dataset
         
-        expected_class = type(tf.data.TFRecordDataset(TestData.test_filename_list).take(-1))
+        expected_class = dict
         self.assertEqual(expected_class, type(subject))
         
     def test_the_data_model_is_split_into_a_test_dataset(self):
         subject = self.dataset.test_dataset
         
-        expected_class = type(tf.data.TFRecordDataset(TestData.test_filename_list).take(-1).batch(2))
+        expected_class = dict
         self.assertEqual(expected_class, type(subject))
         
     def test_the_data_model_can_count_the_number_of_records_in_a_tfrecords_file(self):
@@ -89,21 +89,20 @@ class TestData(tf.test.TestCase):
         subject = self.dataset
         
         expected_records = 16
-        self.assertEqual(expected_records, self.dataset.full_dataset_size)
+        self.assertEqual(expected_records, subject.full_dataset_size)
         
     def test_the_data_model_gets_a_training_batch_as_a_dict_of_tensors(self):
-        subject = self.dataset.get_training_batch_as_tensor_dict()['x']
+        subject = self.dataset.get_training_batch_as_dict()['x']
         
-        expected_class = tf.Tensor
+        expected_class = np.ndarray
         self.assertEqual(expected_class, type(subject))
         
     def test_the_data_model_gets_the_test_dataset_in_a_single_batch(self):
         dataset = self.dataset
-        subject = dataset.get_test_dataset_as_tensor_dict()['x']
+        subject = dataset.get_test_dataset_as_dict()['x']
         
         expected_batch_size = dataset.test_dataset_size
-        actual_batch_size = TestData.sess.run(subject)
-        self.assertAllEqual(expected_batch_size, actual_batch_size.shape[0])
+        self.assertAllEqual(expected_batch_size, subject.shape[0])
         
         
         

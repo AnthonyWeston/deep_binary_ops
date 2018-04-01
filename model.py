@@ -1,5 +1,6 @@
 import tensorflow as tf
 from data import Data
+from tensorflow.python import debug as tf_debug
 
 class Model:
     
@@ -19,9 +20,9 @@ class Model:
         self.hidden_layer_activation = hidden_layer_activation
         
         self.initial_learning_rate = initial_learning_rate
-        self.learning_rate_global_step = tf.Variable(0, trainable=False)
+        self.learning_rate_global_step = tf.Variable(0, trainable=False, name = 'LearningRateGlobalStep')
         self.learning_rate = tf.train.exponential_decay(self.initial_learning_rate, global_step = 
-            self.learning_rate_global_step, decay_steps = 100 * self.training_size // self.batch_size, 
+            self.learning_rate_global_step, decay_steps = self.training_size // self.batch_size, 
             decay_rate = 0.95, staircase = True)
 
         self.x = tf.placeholder(tf.float32, shape = [None, Model.BITS_PER_NUMBER], name = 'X_input')
@@ -54,9 +55,9 @@ class Model:
         sess = self.sess
         
         if dataset_type == 'train':
-            feature_dict = sess.run(self.data.get_training_dataset_as_tensor_dict())
+            feature_dict = self.data.get_training_dataset_as_dict()
         elif dataset_type == 'test':
-            feature_dict = sess.run(self.data.get_test_dataset_as_tensor_dict())
+            feature_dict = self.data.get_test_dataset_as_dict()
 
         return sess.run(self.loss, feed_dict = {self.x: feature_dict['x'],
                                             self.y: feature_dict['y'],
@@ -67,9 +68,9 @@ class Model:
         sess = self.sess
         
         if dataset_type == 'train':
-            feature_dict = sess.run(self.data.get_training_dataset_as_tensor_dict())
+            feature_dict = self.data.get_training_dataset_as_dict()
         elif dataset_type == 'test':
-            feature_dict = sess.run(self.data.get_test_dataset_as_tensor_dict())
+            feature_dict = self.data.get_test_dataset_as_dict()
             
         return sess.run(self.prediction_accuracy, feed_dict = {self.x: feature_dict['x'],
                                             self.y: feature_dict['y'],
@@ -78,12 +79,13 @@ class Model:
 
     def train_for_one_epoch(self):
         for _ in range(self.data.num_batches): 
-            feature_dict = self.sess.run(self.data.get_training_batch_as_tensor_dict())
+            feature_dict = self.data.get_training_batch_as_dict()
 
             self.sess.run(self.optimizer, feed_dict = {self.x: feature_dict['x'],
                                             self.y: feature_dict['y'],
                                             self.z: feature_dict['z'],
                                             self.training_phase: True})
+
             
     def _create_hidden_layer(self, inputs):
         dense_layer = tf.layers.dense(inputs, self.layer_size, activation = None, 
@@ -91,9 +93,11 @@ class Model:
             activity_regularizer = tf.contrib.layers.l2_regularizer(self.regularization_scale),
             kernel_initializer = tf.initializers.random_normal(self.seed))
         
-        batch_norm_layer = tf.layers.batch_normalization(dense_layer, training = self.training_phase)
+        #batch_norm_layer = tf.layers.batch_normalization(dense_layer, training = self.training_phase)
         
-        dropout_layer = tf.layers.dropout(batch_norm_layer, self.dropout_rate, 
+        #dropout_layer = tf.layers.dropout(batch_norm_layer, self.dropout_rate, 
+        #    training = self.training_phase)
+        dropout_layer = tf.layers.dropout(dense_layer, self.dropout_rate, 
             training = self.training_phase)
         
         output = self.hidden_layer_activation(dropout_layer)
@@ -103,7 +107,6 @@ class Model:
     def _build_hidden_layers(self, inputs):
         hidden_layers = [None for _ in range(self.layer_depth)]
         
-        
         hidden_layers[0] = self._create_hidden_layer(inputs)
         
         for i in range(self.layer_depth - 1):
@@ -111,44 +114,49 @@ class Model:
             
         return hidden_layers
     
+    def metrics(self):
+        return """Training loss:    {0}
+Training accuracy:    {1}
+Test loss:    {2}
+Test accuracy    {3}""".format(self.evaluate_loss('train'), self.evaluate_accuracy('train'),
+            self.evaluate_loss('test'), self.evaluate_accuracy('test'))
+    
 """
-For manual testing of the model
+For manual testing and evaluation of the model
 """
+    
     
 if __name__ == '__main__':
         
     sess = tf.Session()
+    sess = tf_debug.LocalCLIDebugWrapperSession(sess)
 
     model = Model(filename_list = ['training_data/add_op_data.tfrecords'],
-        training_size = 63488,
-        batch_size = 1024,
+        training_size = 2 ** 14 - 1024,
+        batch_size = 256,
         seed = 0,
-        initial_learning_rate = .005,
+        initial_learning_rate = .001,
         dropout_rate = .125,
         regularization_scale = .1,
-        layer_size = 20,
-        layer_depth = 4,
+        layer_size = 24,
+        layer_depth = 3,
         hidden_layer_activation = tf.nn.tanh,
         sess = sess
         )
-
-    init = tf.global_variables_initializer()
-    sess.run(init)
     
-    feature_dict = sess.run(model.data.get_training_dataset_as_tensor_dict())
-    print(feature_dict)
+    sess.run(tf.global_variables_initializer())
+
+    for i in range(5):        
+        if i % 1 == 0:
+            metrics = model.metrics()
+            learning_rate = sess.run(model.learning_rate)
+            print('Epoch ' + str(i))
+            print('Learning rate: ' + str(learning_rate))
+            print(metrics)
+            print('\n')
+            
+        model.train_for_one_epoch()
         
-    print(sess.run(model.loss, feed_dict = {model.x: feature_dict['x'],
-                                            model.y: feature_dict['y'],
-                                            model.z: feature_dict['z'],
-                                            model.training_phase: False}))
-
-    model.evaluate_loss('train')
-    
-    model.train_for_one_epoch()
-
-    model.evaluate_loss('train')
-
 
 
 
