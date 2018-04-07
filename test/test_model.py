@@ -2,6 +2,7 @@ import os
 from model import Model
 import tensorflow as tf
 from data import Data
+import numpy as np
 
 test_file_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -12,7 +13,7 @@ class TestModel(tf.test.TestCase):
     training_size = 10
     batch_size = 5
     seed = 1
-    initial_learning_rate = 0.05
+    initial_learning_rate = .05
     dropout_rate = .1
     regularization_scale = 0.01
     layer_size = 24
@@ -168,4 +169,32 @@ class TestModel(tf.test.TestCase):
         
         self.assertGreaterEqual(final_accuracy, initial_accuracy)
         
+    def test_the_training_variables_are_changed_after_one_epoch(self):
+        model = self.create_training_model()
+        sess = model.sess
+
+        before_variables = sess.run(tf.trainable_variables())
+        
+        model.train_for_one_epoch()
+        
+        after_variables = sess.run(tf.trainable_variables())
+        
+        for b, a in zip(before_variables, after_variables):
+            self.assertTrue(np.any(np.not_equal(b,a)))
+            
+    def test_the_training_variables_do_not_stop_training_by_the_100th_epoch(self):
+        model = self.create_training_model()
+        sess = model.sess
+
+        for i in range(100):
+            print(i)
+
+            before_variables = sess.run(tf.trainable_variables())
+            
+            model.train_for_one_epoch()
+            
+            after_variables = sess.run(tf.trainable_variables())
+            
+            for b, a in zip(before_variables, after_variables):
+                self.assertTrue(np.any(np.not_equal(b,a)))
         

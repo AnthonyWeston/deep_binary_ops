@@ -44,7 +44,7 @@ class Data:
                  'y': self.training_dataset['y'][batch_start_index: batch_end_index],
                  'z': self.training_dataset['z'][batch_start_index: batch_end_index]}
         
-        self.batch_num = (self.batch_num + 1 % self.num_batches)
+        self.batch_num = ((self.batch_num + 1) % self.num_batches)
         if(self.batch_num == 0):
             self.shuffle_training_dataset()
         
@@ -78,12 +78,24 @@ class Data:
             np.random.seed(seed = 0)
             np.random.shuffle(self.training_dataset[key])
     
+    
 """
 Code sandbox for figuring stuff out
 """
     
 if __name__ == '__main__':
-    
+
     dataset= Data(['test/test_data.tfrecords'], 10, 2, 0)
-    print(dataset.get_training_dataset_as_tensor_dict()['x'][0:5])
+    
+    for _ in range(10):
+        for key in dataset.training_dataset.keys():
+            print(key + str(dataset.get_training_dataset_as_dict()[key][0]))
+        
+        dataset.shuffle_training_dataset() 
+        print('')            
+              
+              
+              
+              
+    
     

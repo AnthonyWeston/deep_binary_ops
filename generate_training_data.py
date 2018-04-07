@@ -23,10 +23,6 @@ def generate_training_data(limit: int = UINT8_MAX, operations = dg.OPERATIONS,
                     training_example_str = training_example.SerializeToString()
                     training_examples.append(training_example_str)
         
-        random.seed(0)
-        random.shuffle(training_examples)
-        training_examples = training_examples[:2**14]
-        
         for example in training_examples:
             writer.write(example)
             
