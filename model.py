@@ -99,7 +99,7 @@ class Model:
         dense_layer = tf.layers.dense(inputs, self.layer_size, activation = None, 
             kernel_regularizer = tf.contrib.layers.l2_regularizer(self.regularization_scale), 
             activity_regularizer = tf.contrib.layers.l2_regularizer(self.regularization_scale),
-            kernel_initializer = tf.initializers.random_normal(self.seed))
+            kernel_initializer = tf.initializers.random_normal(seed = self.seed))
         
         #batch_norm_layer = tf.layers.batch_normalization(dense_layer, training = self.training_phase)
         

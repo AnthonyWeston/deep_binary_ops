@@ -11,7 +11,7 @@ if __name__ == '__main__':
     sess = tf.Session()
     #sess = tf_debug.LocalCLIDebugWrapperSession(sess)
 
-    model = Model(filename_list = ['training_data/add_op_data.tfrecords'],
+    model = Model(filename_list = ['training_data/multiply_op_data.tfrecords'],
         training_size = 2 ** 12,
         batch_size = 128,
         seed = 0,
@@ -19,7 +19,7 @@ if __name__ == '__main__':
         dropout_rate = 0.0625,
         regularization_scale = .25,
         layer_size = 96,
-        layer_depth = 2,
+        layer_depth = 3,
         hidden_layer_activation = tf.nn.leaky_relu,
         sess = sess
         )
@@ -31,7 +31,7 @@ if __name__ == '__main__':
         if i % 25 == 0:
             metrics = model.metrics()
             learning_rate = sess.run(model.learning_rate)
-            print('Epoch ' + str(i) + ' - Addition Model')
+            print('Epoch ' + str(i) + ' - Multiplication Model')
             print('Learning rate: ' + str(learning_rate))
             print(metrics)
             print('\n')
@@ -41,7 +41,7 @@ if __name__ == '__main__':
             
             print('Example Prediction:\t' + str(model.make_predictions([[0., 0., 0., 0., 1., 1., 0., 1.]], 
                                                           [[0., 1., 0., 0., 0., 1., 0., 1.]])))
-            print('Expected Result:\t[[ 0., 1., 0., 1., 0., 0., 1., 0.]]\n')
+            print('Expected Result:\t[[ 1., 0., 0., 0., 0., 0., 0., 1.]]\n')
 
                           
         model.train_for_one_epoch()
