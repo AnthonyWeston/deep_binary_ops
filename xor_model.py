@@ -9,13 +9,13 @@ if __name__ == '__main__':
     #sess = tf_debug.LocalCLIDebugWrapperSession(sess)
 
     model = Model(filename_list = ['training_data/xor_op_data.tfrecords'],
-        training_size = 2 ** 12,
+        training_size = 2 ** 10,
         batch_size = 128,
         seed = 0,
         initial_learning_rate = .01,
-        dropout_rate = 0.,
+        dropout_rate = 0.125,
         regularization_scale = .25,
-        layer_size = 32,
+        layer_size = 48,
         layer_depth = 3,
         hidden_layer_activation = tf.nn.leaky_relu,
         sess = sess
