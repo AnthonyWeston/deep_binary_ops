@@ -1,6 +1,4 @@
-"""
-For manual testing and evaluation of the model
-"""
+
     
 import tensorflow as tf
 from model import *    
@@ -12,14 +10,14 @@ if __name__ == '__main__':
     #sess = tf_debug.LocalCLIDebugWrapperSession(sess)
 
     model = Model(filename_list = ['training_data/multiply_op_data.tfrecords'],
-        training_size = 2 ** 12,
+        training_size = 2 ** 13,
         batch_size = 128,
         seed = 0,
         initial_learning_rate = .01,
-        dropout_rate = 0.0625,
+        dropout_rate = 0.1,
         regularization_scale = .25,
         layer_size = 96,
-        layer_depth = 3,
+        layer_depth = 5,
         hidden_layer_activation = tf.nn.leaky_relu,
         sess = sess
         )

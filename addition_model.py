@@ -1,6 +1,3 @@
-"""
-For manual testing and evaluation of the model
-"""
     
 import tensorflow as tf
 from model import *    
