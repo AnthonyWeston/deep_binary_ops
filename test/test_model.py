@@ -187,7 +187,6 @@ class TestModel(tf.test.TestCase):
         sess = model.sess
 
         for i in range(100):
-            print(i)
 
             before_variables = sess.run(tf.trainable_variables())
             
